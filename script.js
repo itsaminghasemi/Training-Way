@@ -1,34 +1,51 @@
 (function () {
   /**
-   * Processes messy user input using strict/loose equality and type coercion rules.
-   * @param {*} val - The input value to process.
-   * @returns {string|number} The processed result based on input type.
+   * Analyzes an array of transactions, summing positives, skipping negatives,
+   * and halting on zero.
+   * @param {number[]} transactions - Array of transaction amounts.
+   * @returns {Object} An object containing 'positiveSum' and 'status'.
    */
-  function processValue(val) {
-    // 1. Strict equality check for the exact number 0.
-    if (val === 0) {
-      return 'Strict Zero';
+  function analyzeTransactions(transactions) {
+    let i = 0;
+    // 1. Initialize the sum to 0 to avoid NaN errors.
+    let positiveSum = 0;
+
+    // 2. Iterate through the array using a while loop.
+    while (i < transactions.length) {
+      const current = transactions[i];
+
+      // 3. Halt the entire loop immediately if the transaction is exactly 0.
+      if (current === 0) {
+        break;
+      }
+      // 4. Skip negative numbers.
+      else if (current < 0) {
+        i++; // Must increment before continue to avoid an infinite loop!
+        continue;
+      }
+      // 5. Add positive numbers to the running total.
+      else {
+        positiveSum += current;
+      }
+
+      // 6. Increment the index for the next iteration.
+      i++;
     }
-    // 2. Loose equality check catches other falsy values that coerce to 0 (e.g., "", false, null).
-    else if (val == 0) {
-      return 'Loose Zero-like';
-    }
-    // 3. Check if the value can be coerced into a valid number.
-    // Subtracting 0 forces numeric coercion. If the result is NOT NaN, it's a valid number string.
-    else if (!Number.isNaN(val - 0)) {
-      // Parentheses explicitly show: coerce first, then add 5.
-      return val - 0 + 5;
-    }
-    // 4. If it's not a number, it must be a non-numeric string.
-    else {
-      // The `+` operator prioritizes string concatenation here.
-      return val + ' is text';
-    }
+
+    // 7. Use a ternary operator (Expression) to assign the status string.
+    const status = positiveSum > 100 ? 'High Volume' : 'Low Volume';
+
+    // 8. Return the result using ES6 property shorthand.
+    return { positiveSum, status };
   }
 
   // 🧪 Test Cases
-  console.log(processValue(0)); // Expected: "Strict Zero"
-  console.log(processValue('')); // Expected: "Loose Zero-like"
-  console.log(processValue('10')); // Expected: 15
-  console.log(processValue('hello')); // Expected: "hello is text"
+  console.log(analyzeTransactions([50, -10, 100, 20]));
+  // Expected: { positiveSum: 170, status: "High Volume" }
+
+  console.log(analyzeTransactions([10, 20, 0, 200]));
+  // Expected: { positiveSum: 30, status: "Low Volume" }
+
+  console.log(analyzeTransactions([-5, -10, 0]));
+  // Expected: { positiveSum: 0, status: "Low Volume" }
 })();
