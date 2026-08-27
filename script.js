@@ -1,23 +1,29 @@
 /**
- * Finds the first duplicate number in an array using a Hash Set.
- * @param {number[]} inputArray - The array of numbers to search.
- * @returns {number|undefined} - The first duplicate number, or undefined if none exists.
+ * Finds two indices in a sorted array such that their sum equals the target.
+ * Uses the Two Pointers pattern for O(N) time complexity.
+ * @param {number[]} inputArray - Sorted array of numbers.
+ * @param {number} targetNumber - The target sum.
+ * @returns {number[]} - Array containing the two indices.
  */
-function findFirstDuplicate(inputArray) {
-  // 1. Initialize a Set to keep track of seen numbers (O(1) lookup)
-  const seen = new Set();
+function findTwoSum(inputArray, targetNumber) {
+  let leftIndex = 0;
+  let rightIndex = inputArray.length - 1;
 
-  // 2. Linear traversal of the input array (O(N) time)
-  for (const num of inputArray) {
-    // 3. Check if the number already exists in the Set
-    if (seen.has(num)) {
-      return num; // First duplicate found, return immediately
+  // 1. Continue searching while pointers haven't crossed
+  while (leftIndex < rightIndex) {
+    // 2. Calculate sum dynamically at each step (Cleaner approach)
+    const summition = inputArray[leftIndex] + inputArray[rightIndex];
+
+    // 3. Check conditions based on the current sum
+    if (summition === targetNumber) {
+      return [leftIndex, rightIndex]; // Target found
+    } else if (summition < targetNumber) {
+      leftIndex++; // Sum is too small, move left pointer right to increase sum
+    } else {
+      rightIndex--; // Sum is too large, move right pointer left to decrease sum
     }
-
-    // 4. If not seen, add it to the Set for future checks
-    seen.add(num);
   }
 
-  // 5. Return undefined if the loop completes without finding duplicates
-  return undefined;
+  // 4. Return empty array or null if no pair is found
+  return [];
 }
