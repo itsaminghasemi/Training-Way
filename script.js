@@ -1,35 +1,54 @@
-/**
- * Finds two numbers in a sorted array whose sum equals the target.
- * @param {number[]} numbers - Sorted array of numbers.
- * @param {number} target - The target sum.
- * @returns {[number, number]|undefined} - The matching pair or undefined.
- */
-function findPairWithTarget(numbers, target) {
-  // Initialize the left pointer at the beginning of the array.
-  let left = 0;
+class HashTable {
+  hashKey = [];
+  bucket = [];
+  index = 0;
 
-  // Initialize the right pointer at the end of the array.
-  let right = numbers.length - 1;
-
-  // Continue while the pointers have not crossed.
-  while (left < right) {
-    // Calculate the sum of the values at both pointers.
-    const sum = numbers[left] + numbers[right];
-
-    // Return the pair immediately when the target is found.
-    if (sum === target) {
-      return [numbers[left], numbers[right]];
+  hash(key) {
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+      hash += key.charCodeAt(i);
     }
 
-    // If the sum is too small, move left forward to increase it.
-    if (sum < target) {
-      left++;
-    } else {
-      // If the sum is too large, move right backward to decrease it.
-      right--;
+    return hash % this.bucket.length;
+  }
+  set(key, value) {
+    for (let i = 0; i < this.hashKey.length; i++) {
+      if (this.hash(this.hashKey[i]) === this.hash(key)) {
+        this.index = i;
+      } else {
+        this.index = this.bucket.length - 1;
+      }
     }
+    this.hashKey.push(key);
+    this.bucket[this.index] = [
+      ...(this.bucket[this.index] || []),
+      { key, value },
+    ];
+    return 'done';
   }
 
-  // Return undefined when no valid pair exists.
-  return undefined;
+  get(key) {
+    for (let i = 0; i < this.hashKey.length; i++) {
+      if (this.bucket[i] && this.bucket[i].key === key) {
+        return this.bucket[i].value;
+      } else {
+        return undefined;
+      }
+    }
+  }
 }
+
+const table = new HashTable();
+
+table.set('name', 'Amin');
+table.set('age', 20);
+table.set('role', 'Frontend Developer');
+
+console.log(table.get('name'));
+// Expected output: "Amin"
+
+console.log(table.get('age'));
+// Expected output: 20
+
+console.log(table.get('unknown'));
+// Expected output: undefined
