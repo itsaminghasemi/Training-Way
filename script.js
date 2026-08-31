@@ -1,40 +1,57 @@
 class HashTable {
-  hashKey = [];
-  bucket = [];
-  index = 0;
+  // Store key-value pairs inside fixed-size buckets.
+  bucket = [[], [], [], [], [], [], [], [], [], []];
+
+  // Define the total number of available buckets.
+  capacity = 10;
 
   hash(key) {
+    // Start the hash value at zero.
     let hash = 0;
+
+    // Convert each character into its character code and add it to the hash.
     for (let i = 0; i < key.length; i++) {
       hash += key.charCodeAt(i);
     }
 
-    return hash % this.bucket.length;
+    // Convert the hash value into a valid bucket index.
+    return hash % this.capacity;
   }
+
   set(key, value) {
-    for (let i = 0; i < this.hashKey.length; i++) {
-      if (this.hash(this.hashKey[i]) === this.hash(key)) {
-        this.index = i;
-      } else {
-        this.index = this.bucket.length - 1;
+    // Calculate which bucket should contain this key.
+    const bucketIndex = this.hash(key);
+
+    // Search the bucket for an existing key.
+    for (const item of this.bucket[bucketIndex]) {
+      // If the key already exists, update its value.
+      if (item.key === key) {
+        item.value = value;
+        return 'done';
       }
     }
-    this.hashKey.push(key);
-    this.bucket[this.index] = [
-      ...(this.bucket[this.index] || []),
-      { key, value },
-    ];
+
+    // Add a new key-value pair to the bucket.
+    // This also handles collisions using separate chaining.
+    this.bucket[bucketIndex].push({ key, value });
+
     return 'done';
   }
 
   get(key) {
-    for (let i = 0; i < this.hashKey.length; i++) {
-      if (this.bucket[i] && this.bucket[i].key === key) {
-        return this.bucket[i].value;
-      } else {
-        return undefined;
+    // Calculate which bucket may contain the key.
+    const bucketIndex = this.hash(key);
+
+    // Search only inside the calculated bucket.
+    for (const item of this.bucket[bucketIndex]) {
+      // Return the value when the requested key is found.
+      if (item.key === key) {
+        return item.value;
       }
     }
+
+    // Return undefined when the key does not exist.
+    return undefined;
   }
 }
 
