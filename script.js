@@ -1,71 +1,102 @@
-class HashTable {
-  // Store key-value pairs inside fixed-size buckets.
-  bucket = [[], [], [], [], [], [], [], [], [], []];
+// Represents a single node in the Binary Search Tree.
+class Node {
+  constructor(value) {
+    // Store the value contained in this node.
+    this.value = value;
 
-  // Define the total number of available buckets.
-  capacity = 10;
+    // Reference to the left child.
+    this.left = null;
 
-  hash(key) {
-    // Start the hash value at zero.
-    let hash = 0;
-
-    // Convert each character into its character code and add it to the hash.
-    for (let i = 0; i < key.length; i++) {
-      hash += key.charCodeAt(i);
-    }
-
-    // Convert the hash value into a valid bucket index.
-    return hash % this.capacity;
-  }
-
-  set(key, value) {
-    // Calculate which bucket should contain this key.
-    const bucketIndex = this.hash(key);
-
-    // Search the bucket for an existing key.
-    for (const item of this.bucket[bucketIndex]) {
-      // If the key already exists, update its value.
-      if (item.key === key) {
-        item.value = value;
-        return 'done';
-      }
-    }
-
-    // Add a new key-value pair to the bucket.
-    // This also handles collisions using separate chaining.
-    this.bucket[bucketIndex].push({ key, value });
-
-    return 'done';
-  }
-
-  get(key) {
-    // Calculate which bucket may contain the key.
-    const bucketIndex = this.hash(key);
-
-    // Search only inside the calculated bucket.
-    for (const item of this.bucket[bucketIndex]) {
-      // Return the value when the requested key is found.
-      if (item.key === key) {
-        return item.value;
-      }
-    }
-
-    // Return undefined when the key does not exist.
-    return undefined;
+    // Reference to the right child.
+    this.right = null;
   }
 }
 
-const table = new HashTable();
+class BinarySearchTree {
+  constructor() {
+    // The tree starts without a root node.
+    this.root = null;
+  }
 
-table.set('name', 'Amin');
-table.set('age', 20);
-table.set('role', 'Frontend Developer');
+  insert(value) {
+    // Create a new node for the value.
+    const newNode = new Node(value);
 
-console.log(table.get('name'));
-// Expected output: "Amin"
+    // If the tree is empty, the new node becomes the root.
+    if (this.root === null) {
+      this.root = newNode;
+      return;
+    }
 
-console.log(table.get('age'));
-// Expected output: 20
+    // Start traversal from the root.
+    let currentNode = this.root;
 
-console.log(table.get('unknown'));
-// Expected output: undefined
+    // Continue until the correct position is found.
+    while (true) {
+      // Smaller values belong in the left subtree.
+      if (value < currentNode.value) {
+        // If there is no left child, insert the new node here.
+        if (!currentNode.left) {
+          currentNode.left = newNode;
+          break;
+        }
+
+        // Otherwise, continue searching in the left subtree.
+        currentNode = currentNode.left;
+      } else {
+        // Equal or larger values belong in the right subtree.
+        if (!currentNode.right) {
+          currentNode.right = newNode;
+          break;
+        }
+
+        // Otherwise, continue searching in the right subtree.
+        currentNode = currentNode.right;
+      }
+    }
+  }
+
+  contains(value) {
+    // Start searching from the root.
+    let currentNode = this.root;
+
+    // Continue while there is a node to inspect.
+    while (currentNode) {
+      // Search the left subtree for smaller values.
+      if (value < currentNode.value) {
+        currentNode = currentNode.left;
+      }
+      // Search the right subtree for larger values.
+      else if (value > currentNode.value) {
+        currentNode = currentNode.right;
+      }
+      // The value matches the current node.
+      else {
+        return true;
+      }
+    }
+
+    // The value does not exist in the tree.
+    return false;
+  }
+}
+
+const tree = new BinarySearchTree();
+
+tree.insert(8);
+tree.insert(3);
+tree.insert(10);
+tree.insert(1);
+tree.insert(6);
+tree.insert(14);
+tree.insert(4);
+tree.insert(7);
+
+console.log(tree.contains(6));
+// Expected output: true
+
+console.log(tree.contains(14));
+// Expected output: true
+
+console.log(tree.contains(20));
+// Expected output: false
